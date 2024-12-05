@@ -1,3 +1,4 @@
+const authRouter =require('./routes/auth.route.js')
 const express=require("express");
 const mongoose=require("mongoose");
 require('dotenv').config(); // This loads variables from your .env file
@@ -12,6 +13,11 @@ mongoose.connect(process.env.MONGO).then(()=>{
 )
 const app=express();
 
-app.listen(3000,()=>{
+app.listen(8080,()=>{
     console.log("Port working fine")
 })
+app.get('/',(req,res)=>{
+    res.send("Hello World");
+})
+app.use(express.json());
+app.use('/api/auth',authRouter);
