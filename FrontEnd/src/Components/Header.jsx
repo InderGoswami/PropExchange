@@ -1,9 +1,9 @@
 import React from 'react';
-import logo from "F:/Projects/New folder/client/src/assets/PropExchange.png";
+import logo from "F:/Projects/PropExchange/FrontEnd/src/assets/PropExchange.png";
 
 const Header = () => {
   return (
-    <header className="h-[10vh] bg-[#7AB2D3] shadow-md">
+    <header className="h-[10vh] bg-[#7AB2D3] shadow-md top-0 fixed w-[100%]">
       <div className="h-full flex flex-col md:flex-row justify-between items-center max-w-6xl mx-auto px-4">
         {/* Logo */}
         <div className="h-full w-full md:w-2/5 flex justify-center md:justify-start items-center py-2 md:py-0">
