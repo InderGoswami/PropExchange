@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from "F:/Projects/PropExchange/FrontEnd/src/assets/PropExchange.png";
 
 const Header = () => {
@@ -19,9 +20,15 @@ const Header = () => {
         </form>
         {/* Navigation */}
         <ul className="flex gap-4 text-sm md:text-base lg:text-lg mt-2 md:mt-0">
+          <Link to='/home'>
           <li className="hover:text-blue-700 cursor-pointer">Home</li>
+          </Link>
+          <Link to='/about'>
           <li className="hover:text-blue-700 cursor-pointer">About</li>
+          </Link>
+          <Link to='/sign-in'>
           <li className="hover:text-blue-700 cursor-pointer">Sign in</li>
+          </Link>
         </ul>
       </div>
     </header>

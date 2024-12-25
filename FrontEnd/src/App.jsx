@@ -5,6 +5,8 @@ import Profile from './pages/Profile';
 import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 import Header from './Components/Header';
+import React from 'react';  // Add this to your main.jsx or other JSX files
+
 export default function App() {
   return (
     <BrowserRouter>

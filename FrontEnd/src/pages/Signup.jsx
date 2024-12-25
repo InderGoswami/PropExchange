@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+
+import { Link } from 'react-router-dom'; // Add this line
+
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,7 +29,7 @@ const Signup = () => {
         throw new Error("Signup failed. Please try again.");
       }
 
-      const data = await res.json();
+      const data = await res.text();
       console.log("Signup Successful:", data);
     } catch (error) {
       console.error("Error during signup:", error.message);

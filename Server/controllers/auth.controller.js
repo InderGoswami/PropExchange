@@ -1,5 +1,6 @@
-const User=require("../Models/user.models");
-const bcryptjs=require("bcryptjs");
+import User from "../Models/user.models.js";
+import bcryptjs from 'bcryptjs'
+import { errorHandler } from "../utils/error.js";
 const signup=async (req,res,next)=>{
     const {username,email,password}=req.body;
     if (!username || !email || !password || typeof password !== "string") {
@@ -11,8 +12,8 @@ const signup=async (req,res,next)=>{
     await newUser.save();
     res.status(201).send("User Created Successfully");
     }catch(e){
-        next(e);
+        next(errorHandler(550,'error from this function'));
     }
 
 }
-module.exports=signup;
+export default signup;
