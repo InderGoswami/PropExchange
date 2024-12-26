@@ -10,7 +10,11 @@ const signup=async (req,res,next)=>{
     const newUser=new User({username,email,password:hashedPassword});
     try{
     await newUser.save();
-    res.status(201).send("User Created Successfully");
+    res.status(201).send({
+        "success": true,
+        "message": "Signup successfully."
+      }
+      );
     }catch(e){
         next(errorHandler(550,'error from this function'));
     }

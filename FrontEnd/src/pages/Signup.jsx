@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-
-import { Link } from 'react-router-dom'; // Add this line
-
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [successfull, setSuccessfull] = useState(false);
+
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,6 +19,8 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null); // Reset error on new submit
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
@@ -29,10 +34,25 @@ const Signup = () => {
         throw new Error("Signup failed. Please try again.");
       }
 
-      const data = await res.text();
-      console.log("Signup Successful:", data);
+      const data = await res.json(); // Parse JSON response
+      console.log(data);
+      if (data.success === false) {
+        setLoading(false);
+        setError(data.message);
+        return;
+      } else {
+        setSuccessfull(true);
+        setLoading(false);
+        setError(null); // Reset error state after success
+        console.log("Signup Successful:", data);
+        setTimeout(() => {
+          navigate('/sign-in'); // Redirect after 2 seconds
+        }, 2000);
+      }
     } catch (error) {
       console.error("Error during signup:", error.message);
+      setLoading(false);
+      setError(error.message); // Correct reference to error.message
     }
   };
 
@@ -99,10 +119,11 @@ const Signup = () => {
           </div>
 
           <button
+            disabled={loading}
             type="submit"
             className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Sign Up
+            {loading ? "Loading..." : "Sign Up"}
           </button>
 
           <a
@@ -121,6 +142,11 @@ const Signup = () => {
             </Link>
           </p>
         </div>
+
+        {error && <p className="text-red-500 mt-5 text-center">{error}</p>}
+        {successfull && (
+          <p className="text-green-400 mt-5 text-center">Sign up successful!</p>
+        )}
       </div>
     </div>
   );
