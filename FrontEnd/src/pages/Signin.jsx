@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signInFailure,signInStart,signInSuccess } from "../redux/user/userSlice";
+import OAuth from "../Components/OAuth";
 const SignIn = () => {
   const navigate=useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -103,6 +104,7 @@ const dispatch=useDispatch();
           {error && (
             <p className="mt-4 text-sm text-center text-red-500">{error}</p>
           )}
+          <OAuth></OAuth>
         </form>
 
         <div className="mt-6 text-center">
