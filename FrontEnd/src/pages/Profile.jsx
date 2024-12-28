@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useRef} from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ const ProfilePage = () => {
   const [email, setEmail] = useState(currentUser?.email || '');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const fileRef=useRef();
 
   // Handle form submission for updating user info
   const handleUpdate = () => {
@@ -39,19 +40,22 @@ const ProfilePage = () => {
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Profile</h2>
 
-        {/* User Information Section */}
+       
+       
+
+       
+        <form className="mb-6">
         <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+        <input type="file" ref={fileRef} hidden accept='image/*'/>
           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200">
-            <img src={currentUser?.avatar || 'https://via.placeholder.com/150'} alt="User" className="w-full h-full object-cover" />
+            
+            <img onClick={()=>fileRef.current.click()} src={currentUser?.avatar || 'https://via.placeholder.com/150'} alt="User" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
             <div className="text-lg font-semibold">{currentUser?.username}</div>
             <div className="text-sm text-gray-500">{currentUser?.email}</div>
           </div>
         </div>
-
-        {/* Update Information Form */}
-        <div className="mb-6">
           <div className="flex flex-col mb-4">
             <label htmlFor="username" className="font-semibold">Username</label>
             <input
@@ -91,7 +95,7 @@ const ProfilePage = () => {
           >
             Update Information
           </button>
-        </div>
+        </form>
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-4">
