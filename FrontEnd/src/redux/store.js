@@ -5,9 +5,9 @@ import userReducer from './user/userSlice';
 
 // Persist configuration
 const persistConfig = {
-    key: 'root',
-    storage,
-    version: 1,
+  key: 'root',
+  storage,
+  version: 1,
 };
 
 // Root reducer
@@ -18,11 +18,11 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // Configure store
 export const store = configureStore({
-    reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: false,
-        }),
+  reducer: persistedReducer,  // Use the persisted reducer here
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 // Create a persistor
