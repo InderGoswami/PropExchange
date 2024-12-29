@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 const CreateListing = () => {
+  const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -13,9 +14,56 @@ const CreateListing = () => {
     parking: false,
     type: '',
     offer: false,
-    imageUrls: '',
+    imageUrls: [],
     userRef: '',
   });
+  
+  const [loading, setLoading] = useState(false); // State to handle loading effect
+  const [uploadSuccess, setUploadSuccess] = useState(false); // State to handle success message
+
+  const handleImageSubmit = async (e) => {
+    e.preventDefault();
+
+    if (files.length > 0 && files.length <= 6) {
+      const formData = new FormData();
+      // Append each selected file to the FormData object
+      for (let i = 0; i < files.length; i++) {
+        formData.append('images', files[i]);
+      }
+
+      setLoading(true); // Start the loading effect
+
+      try {
+        // Send a POST request to the backend with the files
+        const response = await fetch('api/upload', {
+          method: 'POST',
+          body: formData, // FormData contains the files
+        });
+        console.log(response);
+        if (!response.ok) {
+          throw new Error('Error uploading files');
+        }
+
+        const result = await response.json();
+        console.log('Files uploaded successfully:', result.imageUrls);
+
+        // Save the image URLs in formData
+        setFormData((prevData) => ({
+          ...prevData,
+          imageUrls: result.imageUrls, // Store the uploaded image URLs
+        }));
+        
+        setUploadSuccess(true); // Set success message
+        setLoading(false); // End the loading effect
+      } catch (error) {
+        console.error('Error uploading files:', error);
+        alert('Error uploading files. Please try again.');
+        setLoading(false); // End the loading effect on error
+      }
+    } else {
+      alert('Please select between 1 and 6 images.');
+    }
+  };
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -32,7 +80,6 @@ const CreateListing = () => {
   };
 
   return (
-
     <div className="pt-16 max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4 text-center">Create a Listing</h1>
       <form onSubmit={handleSubmit}>
@@ -79,12 +126,9 @@ const CreateListing = () => {
           </div>
 
           <div>
-            
             <label htmlFor="regularPrice" className="block font-semibold mb-1">
               Regular Price <span>($/Month)</span>
             </label>
-            
-            
             <input
               type="number"
               id="regularPrice"
@@ -99,7 +143,6 @@ const CreateListing = () => {
             <label htmlFor="discountPrice" className="block font-semibold mb-1">
               Discount Price <span>($/Month)</span>
             </label>
-          
             <input
               type="number"
               id="discountPrice"
@@ -109,131 +152,110 @@ const CreateListing = () => {
               className="w-full p-2 border rounded-md"
             />
           </div>
-            <div className='flex gap-2'>
-          <div className='w-[20%] '>
-            <label htmlFor="bathrooms" className="block font-semibold mb-1">
-              Bathrooms
-            </label>
-            <input
-              type="number"
-              id="bathrooms"
-              value={formData.bathrooms}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded-md"
-            />
+
+          <div className="flex gap-2">
+            <div className="w-[20%]">
+              <label htmlFor="bathrooms" className="block font-semibold mb-1">
+                Bathrooms
+              </label>
+              <input
+                type="number"
+                id="bathrooms"
+                value={formData.bathrooms}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded-md"
+              />
+            </div>
+
+            <div className="w-[20%]">
+              <label htmlFor="bedrooms" className="block font-semibold mb-1">
+                Bedrooms
+              </label>
+              <input
+                type="number"
+                id="bedrooms"
+                value={formData.bedrooms}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded-md"
+              />
+            </div>
           </div>
 
-          <div className='w-[20%]'>
-            <label htmlFor="bedrooms" className="block font-semibold mb-1">
-              Bedrooms
-            </label>
-            <input
-              type="number"
-              id="bedrooms"
-              value={formData.bedrooms}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
-          </div>
           <div className="flex justify-evenly w-[50%]">
-            <label  className="block font-semibold mb-1">
-              Type
-            </label>
+            <label className="block font-semibold mb-1">Type</label>
             <div>
-            <input
-              type="checkbox"
-              id="sale"
-              className='w-5'
-            
-            />
-            <span >Rent</span>
+              <input
+                type="checkbox"
+                id="sale"
+                className="w-5"
+                onChange={handleChange}
+              />
+              <span>Rent</span>
             </div>
             <div>
-            <input
-              type="checkbox"
-              id="rent"
-              className='w-5'
-            
-            />
-            <span>Sell</span>
+              <input
+                type="checkbox"
+                id="rent"
+                className="w-5"
+                onChange={handleChange}
+              />
+              <span>Sale</span>
             </div>
-            
-            
-          </div>
-
-         
-            <div className='flex justify-evenly'>
-          <div className="flex items-center">
-            <label htmlFor="furnished" className="font-semibold mr-2">
-              Furnished
-            </label>
-            <input
-              type="checkbox"
-              id="furnished"
-              checked={formData.furnished}
-              onChange={handleChange}
-              className="form-checkbox"
-            />
-          </div>
-
-          <div className="flex items-center">
-            <label htmlFor="parking" className="font-semibold mr-2">
-              Parking
-            </label>
-            <input
-              type="checkbox"
-              id="parking"
-              checked={formData.parking}
-              onChange={handleChange}
-              className="form-checkbox"
-            />
-          </div>
-
-          <div className="flex items-center">
-            <label htmlFor="offer" className="font-semibold mr-2">
-              Offer
-            </label>
-            <input
-              type="checkbox"
-              id="offer"
-              checked={formData.offer}
-              onChange={handleChange}
-              className="form-checkbox"
-            />
-          </div>
-          </div>
-
-         
-          <div>
-            <label htmlFor="userRef" className="block font-semibold mb-1">
-              User Reference
-            </label>
-            <input
-              type="text"
-              id="userRef"
-              value={formData.userRef}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
-          <div>
-            <h2 className='font-semibold'>Images</h2>
-           <span>Max Images Allowed: 6</span>
-           <div>
-            <input style={{ backgroundColor: '#79D7BE' }} className="p-3 text-white rounded-lg" type="file" id="images" accept="image/*" mulitple/>
-            <button style={{ backgroundColor: '#4DA1A9' }}  className="p-3  rounded text-white ml-2">Upload</button>
-           </div>
           </div>
         </div>
 
+        <div className="mt-4">
+          <label htmlFor="images" className="block font-semibold mb-1">
+            Select Images
+          </label>
+          <input
+            type="file"
+            id="images"
+            multiple
+            accept="image/png, image/jpg, image/jpeg"
+            onChange={(e) => setFiles(e.target.files)}
+            className="w-full p-2 border rounded-md"
+          />
+          <button
+            type="button"
+            onClick={handleImageSubmit}
+            className="mt-2 w-full py-2 bg-blue-500 text-white rounded-md"
+            disabled={loading} // Disable button during upload
+          >
+            {loading ? (
+              <span>Uploading...</span> // Show uploading text while uploading
+            ) : (
+              <span>Upload Images</span>
+            )}
+          </button>
+        </div>
+
+        {/* Success message */}
+        {uploadSuccess && (
+          <div className="mt-4 text-green-500 font-semibold">
+            Files uploaded successfully!
+          </div>
+        )}
+
+        {/* Display the list of uploaded files */}
+        {formData.imageUrls.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">Uploaded Files:</h3>
+            <ul>
+              {formData.imageUrls.map((url, index) => (
+                <li key={index}>
+                  <img src={url} alt={`Uploaded file ${index + 1}`} className="w-32 h-32 object-cover" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <button
-        style={{ backgroundColor: '#2E5077' }}
           type="submit"
-          className="mt-6 w-full  text-white py-2 rounded-md hover:bg-blue-600"
+          className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md"
         >
           Submit Listing
         </button>
