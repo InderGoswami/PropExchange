@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { updateUserFailure, updateUserSuccess, updateUserStart } from '../redux/user/userSlice';
-
+import { deleteUserFailure,deleteUserStart,deleteUserSuccess } from '../redux/user/userSlice';
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [username, setUsername] = useState(currentUser?.username || '');
@@ -50,6 +50,23 @@ const Profile = () => {
       console.error('Update error:', error);
     }
   };
+  const handleDeleteUser=async()=>{
+    try{
+      dispatch(deleteUserStart());
+      const res=await fetch(`/api/user/delete/${currentUser._id}`,{
+        method:'DELETE',
+      });
+      const data=await res.json();
+      if(data.success===false){
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+
+    }catch(error){
+      dispatch(deleteUserSuccess(error));
+    } 
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 ">
@@ -126,6 +143,9 @@ const Profile = () => {
             Update Information
           </button>
         </form>
+        <div className="flex justify-between mt-5">
+          <span onClick={handleDeleteUser} className='text-red-500 cursor-pointer'>Delete Account</span>
+        </div>
       </div>
     </div>
   );
