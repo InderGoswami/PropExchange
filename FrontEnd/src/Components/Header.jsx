@@ -7,7 +7,7 @@ const Header = () => {
   const { currentUser } = useSelector(state => state.user);
 
   return (
-    <header className="h-[10vh] bg-[#7AB2D3] shadow-md fixed top-0 w-full z-50">
+    <header className=" bg-[#7AB2D3] shadow-md fixed top-0 left-0 w-full h-16 z-50">
       <div className="h-full flex flex-col md:flex-row justify-between items-center max-w-6xl mx-auto px-4">
         {/* Logo */}
         <div className="h-full w-full md:w-1/4 flex justify-center md:justify-start items-center py-2 md:py-0">

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,Link} from 'react-router-dom';
 import { updateUserFailure, updateUserSuccess, updateUserStart } from '../redux/user/userSlice';
 import { deleteUserFailure,deleteUserStart,deleteUserSuccess } from '../redux/user/userSlice';
 import { signOutFailure,signOutSuccess,signOutStart} from '../redux/user/userSlice';
@@ -90,7 +90,7 @@ const Profile = () => {
   
 
   return (
-    <div className="container mx-auto px-4 py-6 ">
+    <div className="container mx-auto w-[50%] px-4 py-6 ">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Profile</h2>
 
@@ -168,6 +168,9 @@ const Profile = () => {
           <span onClick={handleDeleteUser} className='text-red-500 cursor-pointer'>Delete Account</span>
           <span onClick={handleSignOut} className='text-sky-500 cursor-pointer'>Sign Out</span>
         </div>
+        <Link className="flex justify-center bg-orange-500 p-3 rounded-lg text-white m-2 hover:opacity-95" to={"/create-listing"}>
+        Create Listing
+        </Link>
       </div>
     </div>
   );
