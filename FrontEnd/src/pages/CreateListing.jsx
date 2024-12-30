@@ -77,33 +77,45 @@ const CreateListing = () => {
     e.preventDefault();
     setSavingListing(true);
     setError(null);
-
+  
+    if (!currentUser || !currentUser._id) {
+      console.error("Current user ID is missing");
+      setError("User not logged in");
+      setSavingListing(false);
+      return;
+    }
+  
     try {
+      const requestBody = {
+        ...formData,
+        userRef: currentUser._id,
+      };
+      console.log("Form Data being sent:", requestBody); // Log the body for debugging
+  
       const response = await fetch('/api/listing/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          userRef: currentUser._id,
-        }),
+        body: JSON.stringify(requestBody),
       });
-
+  
       const result = await response.json();
-
-      if (!response.ok || !result.success) {
+      console.log(result);
+  
+      if (!response.ok) {
         throw new Error(result.message || 'Error creating listing');
       }
-
+  
       setUploadListSuccess(true);
     } catch (err) {
-      console.error(err);
-      setError(err.message);
+      console.error("Error creating listing:", err);
+      setError(err.message || "An unknown error occurred");
     } finally {
       setSavingListing(false);
     }
   };
+  ;
 
   return (
     <div className="pt-16 max-w-5xl mx-auto p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-white shadow-lg rounded-lg">
