@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { Navigation } from 'swiper/modules';
+import { useSelector } from 'react-redux';
+import Contact from '../Components/Contact';
 import 'swiper/css/bundle';
 import { FaGift, FaMapMarkerAlt, FaBed, FaBath, FaParking, FaCouch } from 'react-icons/fa';
 
 SwiperCore.use([Navigation]);
 
 function Listing() {
+  const currentUser = useSelector((state) => state.user);
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [discount, setDiscount] = useState(false);
+  const [contact, setContact] = useState(false);
   const params = useParams();
 
   useEffect(() => {
@@ -63,6 +67,21 @@ function Listing() {
             ))}
           </Swiper>
 
+          {/* Contact Owner Button */}
+          {currentUser && listing.userRef !== currentUser._id && !contact && (
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => setContact(true)}
+                className="bg-blue-600 text-white rounded-lg uppercase hover:bg-blue-700 px-6 py-3 transition duration-300"
+              >
+                Contact Owner
+              </button>
+            </div>
+          )}
+
+          {/* Contact Form */}
+          {contact && <Contact listing={listing} />}
+
           {/* Listing Details */}
           <div className="mt-8">
             <h1 className="text-4xl font-semibold text-primary">{listing.name}</h1>
@@ -108,13 +127,13 @@ function Listing() {
               <div className="flex items-center">
                 <FaParking size={24} className="text-gray-600" />
                 <span className="ml-2 text-gray-700">
-                  {listing.parking ? "Parking Available" : "No Parking"}
+                  {listing.parking ? 'Parking Available' : 'No Parking'}
                 </span>
               </div>
               <div className="flex items-center">
                 <FaCouch size={24} className="text-gray-600" />
                 <span className="ml-2 text-gray-700">
-                  {listing.furnished ? "Furnished" : "Unfurnished"}
+                  {listing.furnished ? 'Furnished' : 'Unfurnished'}
                 </span>
               </div>
             </div>
