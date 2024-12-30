@@ -42,10 +42,10 @@ const upload = multer({ storage });
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/listing', listingRouter);
-app.use(express.static(path.join(__diranme, '/FrontEnd/dist')));
+app.use(express.static(path.join(__dirname, '/frontend/dist')));
 // Image Upload Route (using multer for file uploads and cloudinary storage)
 app.get('*',(req,res)=>{
-  res.sendFile(path.join(__diranme, 'FrontEnd','dist','index.html'));
+  res.sendFile(path.join(__dirname, 'frontend','dist','index.html'));
 })
 app.post('/api/upload', upload.array('images', 6), async (req, res) => {
   try {
