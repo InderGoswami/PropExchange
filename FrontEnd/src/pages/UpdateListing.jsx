@@ -1,7 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
-
+import { useParams } from 'react-router-dom';
 const CreateListing = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
@@ -26,7 +25,19 @@ const CreateListing = () => {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadListSuccess, setUploadListSuccess] = useState(false);
   const [error, setError] = useState(null);
-  
+  const params=useParams();
+  useEffect(()=>{
+    const fetchListing=async()=>{
+        const listingId=params.listingId;
+        const res=await fetch(`/api/listing/get/${listingId}`);
+        const data=await res.json();
+        if(data.success===false){
+            console.log(data.message);
+        }
+        setFormData(data);
+    }
+    fetchListing();
+},[])
   const handleImageSubmit = async (e) => {
     e.preventDefault();
 
@@ -93,14 +104,14 @@ const CreateListing = () => {
       };
       console.log("Form Data being sent:", requestBody); // Log the body for debugging
   
-      const response = await fetch('/api/listing/create', {
+      const response = await fetch(`/api/listing/update/${params.listingId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
       });
-  
+      console.log(response);
       const result = await response.json();
       console.log(result);
   
@@ -120,7 +131,7 @@ const CreateListing = () => {
 
   return (
     <div className="pt-16 max-w-5xl mx-auto p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold mb-4 text-center">Create a Listing</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">Update a Listing</h1>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -345,12 +356,12 @@ const CreateListing = () => {
           className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md hover:opacity-95 disabled:opacity-80"
           disabled={savingListing}
         >
-          {savingListing ? 'Submitting...' : 'Create Listing'}
+          {savingListing ? 'Submitting...' : 'Updating Listing'}
         </button>
 
         {error && <p className="text-red-700 text-sm mt-2">{error}</p>}
         {uploadListSuccess && (
-          <p className="text-green-700 text-sm mt-2">Listing added successfully!</p>
+          <p className="text-green-700 text-sm mt-2">Listing updated successfully!</p>
         )}
       </form>
     </div>

@@ -224,7 +224,9 @@ const Profile = () => {
             </div>
             <div className='flex gap-1'>
               <button onClick={()=>handleListingDelete(listing._id)} className="text-red-600 uppercase border rounded-md p-2">Delete</button>
+              <Link to={`/update-listing/${listing._id}`}>
               <button className="text-green-500 uppercase border rounded-md p-2">Edit</button>
+              </Link>
             </div>
             
           </div>
