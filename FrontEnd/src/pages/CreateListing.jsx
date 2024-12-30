@@ -1,64 +1,64 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const CreateListing = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     address: '',
-    regularPrice: '',
-    discountPrice: '',
-    bathrooms: '',
-    bedrooms: '',
+    regularPrice: 0,
+    discountPrice: 0,
+    bathrooms: 1,
+    bedrooms: 1,
     furnished: false,
     parking: false,
-    type: '',
+    type: 'rent',
     offer: false,
     imageUrls: [],
     userRef: '',
   });
-  
-  const [loading, setLoading] = useState(false); // State to handle loading effect
-  const [uploadSuccess, setUploadSuccess] = useState(false); // State to handle success message
+
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [savingListing, setSavingListing] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadListSuccess, setUploadListSuccess] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleImageSubmit = async (e) => {
     e.preventDefault();
 
     if (files.length > 0 && files.length <= 6) {
-      const formData = new FormData();
-      // Append each selected file to the FormData object
-      for (let i = 0; i < files.length; i++) {
-        formData.append('images', files[i]);
+      const imageData = new FormData();
+      for (let file of files) {
+        imageData.append('images', file);
       }
 
-      setLoading(true); // Start the loading effect
+      setUploadingImages(true);
+      setError(null);
 
       try {
-        // Send a POST request to the backend with the files
-        const response = await fetch('api/upload', {
+        const response = await fetch('/api/upload', {
           method: 'POST',
-          body: formData, // FormData contains the files
+          body: imageData,
         });
-        console.log(response);
+
         if (!response.ok) {
           throw new Error('Error uploading files');
         }
 
         const result = await response.json();
-        console.log('Files uploaded successfully:', result.imageUrls);
-
-        // Save the image URLs in formData
         setFormData((prevData) => ({
           ...prevData,
-          imageUrls: result.imageUrls, // Store the uploaded image URLs
+          imageUrls: result.imageUrls,
         }));
-        
-        setUploadSuccess(true); // Set success message
-        setLoading(false); // End the loading effect
-      } catch (error) {
-        console.error('Error uploading files:', error);
-        alert('Error uploading files. Please try again.');
-        setLoading(false); // End the loading effect on error
+        setUploadSuccess(true);
+      } catch (err) {
+        console.error(err);
+        setError('Error uploading files. Please try again.');
+      } finally {
+        setUploadingImages(false);
       }
     } else {
       alert('Please select between 1 and 6 images.');
@@ -66,21 +66,47 @@ const CreateListing = () => {
   };
 
   const handleChange = (e) => {
-    const { id, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+    const { id, value, checked, type } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
       [id]: type === 'checkbox' ? checked : value,
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // You can add the API call logic here to send data to your backend
+    setSavingListing(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/listing/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          userRef: currentUser._id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Error creating listing');
+      }
+
+      setUploadListSuccess(true);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setSavingListing(false);
+    }
   };
 
   return (
-    <div className="pt-16 max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div className="pt-16 max-w-5xl mx-auto p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold mb-4 text-center">Create a Listing</h1>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -124,13 +150,53 @@ const CreateListing = () => {
               className="w-full p-2 border rounded-md"
             />
           </div>
-
+          <div>
+              <label className="block font-semibold mb-1">Type</label>
+              <div className="flex gap-4">
+                <label>
+                  <input
+                    type="radio"
+                    id="rent"
+                    name="type"
+                    value="rent"
+                    checked={formData.type === 'rent'}
+                    onChange={(e) =>
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        type: e.target.value,
+                      }))
+                    }
+                  />
+                  
+                 <span></span> Rent
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    id="sale"
+                    name="type"
+                    value="sale"
+                    checked={formData.type === 'sale'}
+                    onChange={(e) =>
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        type: e.target.value,
+                      }))
+                    }
+                  
+                  />
+                  <span> </span>Sale
+                </label>
+              </div>
+            </div>
           <div>
             <label htmlFor="regularPrice" className="block font-semibold mb-1">
-              Regular Price <span>($/Month)</span>
+              Regular Price {formData.type==="rent" && <span>($/Month)</span>}
             </label>
             <input
               type="number"
+              min="50"
+              max="10000000"
               id="regularPrice"
               value={formData.regularPrice}
               onChange={handleChange}
@@ -138,10 +204,10 @@ const CreateListing = () => {
               className="w-full p-2 border rounded-md"
             />
           </div>
-
+          {formData.offer && (
           <div>
             <label htmlFor="discountPrice" className="block font-semibold mb-1">
-              Discount Price <span>($/Month)</span>
+              Discount Price {formData.type==="rent" && <span>($/Month)</span>}
             </label>
             <input
               type="number"
@@ -151,7 +217,7 @@ const CreateListing = () => {
               required
               className="w-full p-2 border rounded-md"
             />
-          </div>
+          </div>)}
 
           <div className="flex gap-2">
             <div className="w-[20%]">
@@ -175,6 +241,8 @@ const CreateListing = () => {
               <input
                 type="number"
                 id="bedrooms"
+                min="1"
+                max="10"
                 value={formData.bedrooms}
                 onChange={handleChange}
                 required
@@ -183,25 +251,37 @@ const CreateListing = () => {
             </div>
           </div>
 
-          <div className="flex justify-evenly w-[50%]">
-            <label className="block font-semibold mb-1">Type</label>
-            <div>
-              <input
-                type="checkbox"
-                id="sale"
-                className="w-5"
-                onChange={handleChange}
-              />
-              <span>Rent</span>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                id="rent"
-                className="w-5"
-                onChange={handleChange}
-              />
-              <span>Sale</span>
+          <div className="flex flex-row gap-4">
+            
+
+            <div className="flex items-center gap-4">
+              <label>
+                <input
+                  type="checkbox"
+                  id="parking"
+                  checked={formData.parking}
+                  onChange={handleChange}
+                />
+                &nbsp; Parking Spot
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  id="furnished"
+                  checked={formData.furnished}
+                  onChange={handleChange}
+                />
+                &nbsp;  Furnished
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  id="offer"
+                  checked={formData.offer}
+                  onChange={handleChange}
+                />
+                &nbsp; Offer
+              </label>
             </div>
           </div>
         </div>
@@ -222,28 +302,22 @@ const CreateListing = () => {
             type="button"
             onClick={handleImageSubmit}
             className="mt-2 w-full py-2 bg-blue-500 text-white rounded-md"
-            disabled={loading} // Disable button during upload
+            disabled={uploadingImages}
           >
-            {loading ? (
-              <span>Uploading...</span> // Show uploading text while uploading
-            ) : (
-              <span>Upload Images</span>
-            )}
+            {uploadingImages ? 'Uploading...' : 'Upload Images'}
           </button>
         </div>
 
-        {/* Success message */}
         {uploadSuccess && (
           <div className="mt-4 text-green-500 font-semibold">
             Files uploaded successfully!
           </div>
         )}
 
-        {/* Display the list of uploaded files */}
         {formData.imageUrls.length > 0 && (
           <div className="mt-4">
             <h3 className="text-lg font-semibold">Uploaded Files:</h3>
-            <ul>
+            <ul className="grid grid-cols-3 gap-4">
               {formData.imageUrls.map((url, index) => (
                 <li key={index}>
                   <img src={url} alt={`Uploaded file ${index + 1}`} className="w-32 h-32 object-cover" />
@@ -255,10 +329,16 @@ const CreateListing = () => {
 
         <button
           type="submit"
-          className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md"
+          className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md hover:opacity-95 disabled:opacity-80"
+          disabled={savingListing}
         >
-          Submit Listing
+          {savingListing ? 'Submitting...' : 'Create Listing'}
         </button>
+
+        {error && <p className="text-red-700 text-sm mt-2">{error}</p>}
+        {uploadListSuccess && (
+          <p className="text-green-700 text-sm mt-2">Listing added successfully!</p>
+        )}
       </form>
     </div>
   );
