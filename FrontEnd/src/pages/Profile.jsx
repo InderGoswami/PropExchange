@@ -14,7 +14,8 @@ const Profile = () => {
   const fileRef = useRef();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [userListings,setUserListings]=useState([]);
+  const[showListingsError,setshowLisitngsError]=useState(false);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
     console.log(formData);
@@ -87,6 +88,22 @@ const Profile = () => {
      
     }
   };
+  const handleShowListings=async()=>{
+    try{
+      setshowLisitngsError(false)
+      const res=await fetch(`api/user/listings/${currentUser._id}`);
+      const data=await res.json();
+      if(data.success===false){
+        setshowLisitngsError(true);
+        return;
+      }
+      setUserListings(data);
+    }
+
+    catch(error){
+      setshowLisitngsError(true);
+    }
+  }
   
 
   return (
@@ -168,10 +185,42 @@ const Profile = () => {
           <span onClick={handleDeleteUser} className='text-red-500 cursor-pointer'>Delete Account</span>
           <span onClick={handleSignOut} className='text-sky-500 cursor-pointer'>Sign Out</span>
         </div>
+        
         <Link className="flex justify-center bg-orange-500 p-3 rounded-lg text-white m-2 hover:opacity-95" to={"/create-listing"}>
         Create Listing
         </Link>
+        <div className='flex justify-center'>
+        <button type="button" onClick={handleShowListings} className=' text-green-800 '>Show Listings</button>
+        </div>
+        {showListingsError&& <p className='text-red-500'>Error is displaying Listings</p>}
+        
       </div>
+      <div className='flex gap-2 flex-col mt-4'>
+       
+      {userListings && userListings.length>0 && (
+        userListings.map((listing)=>(
+          <div key={listing._id} className='border rounded-lg p-3 flex justify-between items-center flex-row'>
+            <div>
+            <Link to={`/listing/${listing._id}`}>
+            <img src={listing.imageUrls[0]} className='h-16 w-16 object-contain rounded-lg' />
+            </Link>
+
+            <Link to={`/listing/${listing._id}`}>
+            <p className='text-cyan-700 font-semibold flex-1 hover:font-bold truncate'>{listing.name}</p>
+            </Link>
+            </div>
+            <div className='flex gap-1'>
+              <button className="text-red-600 uppercase border rounded-md p-2">Delete</button>
+              <button className="text-green-500 uppercase border rounded-md p-2">Edit</button>
+            </div>
+            
+          </div>
+
+        ))
+      )
+
+      }
+  </div>
     </div>
   );
 };
