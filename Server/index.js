@@ -24,7 +24,7 @@ mongoose.connect(process.env.MONGO)
 const app = express();
 const __diranme = path.resolve();
 
-// Enable CORS for all routes, with credentials allowed
+
 app.use(cors({
   origin: "http://localhost:5173", // Frontend URL
   credentials: true, // Allow credentials (cookies, etc.)
@@ -42,10 +42,10 @@ const upload = multer({ storage });
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/listing', listingRouter);
-app.use(express.static(path.join(__diranme, '/frontend/dist')));
+app.use(express.static(path.join(__diranme, '/FrontEnd/dist')));
 // Image Upload Route (using multer for file uploads and cloudinary storage)
 app.get('*',(req,res)=>{
-  res.sendFile(path.join(__diranme, 'frontend','dist','index.html'));
+  res.sendFile(path.join(__diranme, 'FrontEnd','dist','index.html'));
 })
 app.post('/api/upload', upload.array('images', 6), async (req, res) => {
   try {
