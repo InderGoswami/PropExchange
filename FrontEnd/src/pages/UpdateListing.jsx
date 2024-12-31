@@ -356,7 +356,7 @@ const CreateListing = () => {
           className="mt-4 w-full py-2 bg-blue-500 text-white rounded-md hover:opacity-95 disabled:opacity-80"
           disabled={savingListing}
         >
-          {savingListing ? 'Submitting...' : 'Updating Listing'}
+          {savingListing ? 'Submitting...' : 'Update Listing'}
         </button>
 
         {error && <p className="text-red-700 text-sm mt-2">{error}</p>}

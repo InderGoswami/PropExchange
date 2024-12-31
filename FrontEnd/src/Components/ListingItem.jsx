@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 function ListingItem({ listing }) {
   return (
     <div className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden w-full sm:w-[300px] transform hover:scale-105">
-      <Link to={`/listing/${listing.id}`}>
+      <Link to={`/listing/${listing._id}`}> {/* Use listing._id */}
         <img
           src={listing.imageUrls[0]}
           className="h-[320px] sm:h-[220px] w-full object-cover rounded-t-lg"
@@ -24,7 +24,7 @@ function ListingItem({ listing }) {
           ${listing.offer ? listing.discountPrice.toLocaleString('en-US') : listing.regularPrice.toLocaleString('en-US')}
         </p>
         {listing.type === 'rent' && <p className="text-sm text-gray-600 mt-1">Per month</p>}
-        <div className="mt-3 space-y-2 text-sm text-gray-600 ">
+        <div className="mt-3 space-y-2 text-sm text-gray-600">
           <div className="flex items-center gap-2">
             <FaBed className="text-slate-500" />
             <span>{listing.bedrooms > 1 ? `${listing.bedrooms} beds` : `${listing.bedrooms} bed`}</span>

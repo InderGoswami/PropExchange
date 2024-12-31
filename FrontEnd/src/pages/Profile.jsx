@@ -120,9 +120,9 @@ const Profile = () => {
   }
 
   return (
-    <div className="container mx-auto w-[50%] px-4 py-6 ">
+    <div className="container mx-auto w-[50%] px-4 py-6 mt-14 " style={{backgroundColor:'#8D77AB'}}>
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Profile</h2>
+        <h2 className="text-2xl font-bold mb-4" style={{color:'#E82561'}}>Profile</h2>
 
         {/* Message Display */}
         {message && (
@@ -190,7 +190,7 @@ const Profile = () => {
             />
           </div>
 
-          <button className="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+          <button className="w-full py-2  text-white rounded-md "  style={{backgroundColor:'#E82561'}}>
             Update Information
           </button>
         </form>
@@ -208,7 +208,7 @@ const Profile = () => {
         {showListingsError&& <p className='text-red-500'>Error is displaying Listings</p>}
         
       </div>
-      <div className='flex gap-2 flex-col mt-4'>
+      <div className='flex gap-2 flex-col mt-4 bg-slate-100 rounded-xl'>
        
       {userListings && userListings.length>0 && (
         userListings.map((listing)=>(

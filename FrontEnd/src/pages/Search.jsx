@@ -47,11 +47,20 @@ function Search() {
       const searchQuery = urlParams.toString();
       const response = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await response.json();
-      if (data.length > 8) {
-        setShowMore(true);
+
+      console.log('Fetched data:', data);  // Log the data for debugging
+
+      // Ensure data is an array and has content
+      if (Array.isArray(data) && data.length > 0) {
+        if (data.length > 8) {
+          setShowMore(true);
+        }
+        setAllListings(data);  // Store all listings
+        setListings(data.slice(0, visibleListings));  // Show initial listings
+      } else {
+        setListings([]);  // Handle the case when no valid data is returned
       }
-      setAllListings(data); // Store all listings
-      setListings(data.slice(0, visibleListings)); // Show initial listings
+
       setLoading(false);
     };
 
@@ -87,13 +96,16 @@ function Search() {
 
   const onShowMoreClick = () => {
     // Increase the number of visible listings
-    setVisibleListings((prev) => prev + 8); // Show 8 more listings each time
-    setListings(allListings.slice(0, visibleListings + 8)); // Update the listings shown
-    if (visibleListings + 8 >= allListings.length) {
-      setShowMore(false); // Hide the "Show More" button when all listings are shown
-    }
+    setVisibleListings((prev) => {
+      const newVisibleListings = prev + 8; // Calculate new visible listings count
+      setListings(allListings.slice(0, newVisibleListings)); // Update the listings shown
+      if (newVisibleListings >= allListings.length) {
+        setShowMore(false); // Hide the "Show More" button when all listings are shown
+      }
+      return newVisibleListings; // Return the new visible listings count
+    });
   };
-
+  
   return (
     <div className="mt-14 flex flex-col md:flex-row">
       <div className="p-6 md:p-8 border-b-2 md:border-r-2 md:min-h-screen bg-white shadow-lg rounded-lg">
@@ -210,15 +222,16 @@ function Search() {
           {!loading && listings.map((listing) => (
             <ListingItem key={listing._id} listing={listing} />
           ))}
-          {showMore && (
+         
+        </div>
+        {showMore && (
             <button
               onClick={onShowMoreClick}
-              className="bg-slate-500 text-white p-3 rounded-lg hover:opacity-95 transition-opacity"
+              className="bg-slate-500 text-white p-3 rounded-lg hover:opacity-95 transition-opacity h-[50px] mt-2"
             >
               Show More
             </button>
           )}
-        </div>
       </div>
     </div>
   );

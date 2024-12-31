@@ -18,6 +18,7 @@ export default function Home() {
         const res = await fetch('/api/listing/get?offer=true&limit=4');
         const data = await res.json();
         setOfferListings(data);
+        console.log(data)
         fetchRentListings();
       } catch (error) {
         console.log(error);
@@ -96,7 +97,9 @@ export default function Home() {
             </div>
             <div className='flex flex-wrap gap-4'>
               {offerListings.map((listing) => (
+                       <Link to={`/listing/${listing._id}`}>
                 <ListingItem listing={listing} key={listing._id} />
+                </Link>
               ))}
             </div>
           </div>
@@ -109,7 +112,9 @@ export default function Home() {
             </div>
             <div className='flex flex-wrap gap-4'>
               {rentListings.map((listing) => (
+                <Link to={`/listing/${listing._id}`}>
                 <ListingItem listing={listing} key={listing._id} />
+                </Link>
               ))}
             </div>
           </div>
@@ -122,7 +127,11 @@ export default function Home() {
             </div>
             <div className='flex flex-wrap gap-4'>
               {saleListings.map((listing) => (
+                
+                <Link to={`/listing/${listing._id}`}>
+                  
                 <ListingItem listing={listing} key={listing._id} />
+                </Link>
               ))}
             </div>
           </div>
