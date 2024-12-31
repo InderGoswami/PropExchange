@@ -8,6 +8,7 @@ import authRouter from './routes/auth.route.js';
 import listingRouter from './routes/listing.route.js';
 import { storage } from './cloudConfig.js'; // Assuming this is your Cloudinary storage config
 import multer from 'multer';
+import path from 'path';
 
 dotenv.config(); // Loads environment variables from your .env file
 
@@ -21,6 +22,7 @@ mongoose.connect(process.env.MONGO)
   });
 
 const app = express();
+const __diranme = path.resolve();
 
 // Enable CORS for all routes, with credentials allowed
 app.use(cors({
@@ -40,8 +42,11 @@ const upload = multer({ storage });
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/listing', listingRouter);
-
+app.use(express.static(path.join(__diranme, '/frontend/dist')));
 // Image Upload Route (using multer for file uploads and cloudinary storage)
+app.get('*',(req,res)=>{
+  res.sendFile(path.join(__diranme, 'frontend','dist','index.html'));
+})
 app.post('/api/upload', upload.array('images', 6), async (req, res) => {
   try {
     // Log files for debugging
