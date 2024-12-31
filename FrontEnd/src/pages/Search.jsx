@@ -6,6 +6,7 @@ function Search() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
+  const [allListings, setAllListings] = useState([]); // Store all fetched listings
   const [sidebarData, setSidebarData] = useState({
     searchTerm: '',
     type: 'all',
@@ -16,6 +17,9 @@ function Search() {
     order: 'desc',
   });
 
+  const [showMore, setShowMore] = useState(false);
+  const [visibleListings, setVisibleListings] = useState(8); // Initially show 8 listings
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get('searchTerm');
@@ -25,7 +29,7 @@ function Search() {
     const offerFromUrl = urlParams.get('offer');
     const sortFromUrl = urlParams.get('sort');
     const orderFromUrl = urlParams.get('order');
-    
+
     if (searchTermFromUrl || typeFromUrl || parkingFromUrl || furnishedFromUrl || offerFromUrl || sortFromUrl || orderFromUrl) {
       setSidebarData({
         searchTerm: searchTermFromUrl || '',
@@ -43,12 +47,16 @@ function Search() {
       const searchQuery = urlParams.toString();
       const response = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await response.json();
-      setListings(data);
+      if (data.length > 8) {
+        setShowMore(true);
+      }
+      setAllListings(data); // Store all listings
+      setListings(data.slice(0, visibleListings)); // Show initial listings
       setLoading(false);
     };
 
     fetchListings();
-  }, [location.search]);
+  }, [location.search, visibleListings]);
 
   const handleChange = (e) => {
     const { id, type, checked, value } = e.target;
@@ -75,6 +83,15 @@ function Search() {
     urlParams.set('sort', sidebarData.sort);
     urlParams.set('order', sidebarData.order);
     navigate(`/search?${urlParams.toString()}`);
+  };
+
+  const onShowMoreClick = () => {
+    // Increase the number of visible listings
+    setVisibleListings((prev) => prev + 8); // Show 8 more listings each time
+    setListings(allListings.slice(0, visibleListings + 8)); // Update the listings shown
+    if (visibleListings + 8 >= allListings.length) {
+      setShowMore(false); // Hide the "Show More" button when all listings are shown
+    }
   };
 
   return (
@@ -193,6 +210,14 @@ function Search() {
           {!loading && listings.map((listing) => (
             <ListingItem key={listing._id} listing={listing} />
           ))}
+          {showMore && (
+            <button
+              onClick={onShowMoreClick}
+              className="bg-slate-500 text-white p-3 rounded-lg hover:opacity-95 transition-opacity"
+            >
+              Show More
+            </button>
+          )}
         </div>
       </div>
     </div>
